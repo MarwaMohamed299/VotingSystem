@@ -6,7 +6,6 @@ using VotingSystem.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 Log.Logger = new LoggerConfiguration()
     .ReadFrom
     .Configuration(builder.Configuration)
@@ -28,15 +27,13 @@ try
 
     #endregion
 
-   
-
     #region Global Services
     builder.Services.AddInfraStructureConfiguration(builder.Configuration);
     builder.Services.AddApplicationConfiguration(builder.Configuration);
     #endregion
 
     #region Exception Handler
-   // builder.Services.AddExceptionHandler<ExceptionHandler>();
+    // builder.Services.AddExceptionHandler<ExceptionHandler>();
     builder.Services.AddProblemDetails();
     #endregion
 
@@ -61,7 +58,7 @@ try
         app.UseSwaggerUI();
     }
 
-   
+
 
     app.UseHttpsRedirection();
 

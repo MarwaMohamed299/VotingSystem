@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VotingSystem.Infrastructure.Context;
+using VotingSystem.Infrastructure.Data.Context;
 
 namespace VotingSystem.Infrastructure
 {
