@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VotingSystem.Infrastructure.Data.Context;
 using VotingSystem.Infrastructure.Repositories.Polls;
+using VotingSystem.Infrastructure.Repositories.Votes;
 
 namespace VotingSystem.Infrastructure
 {
@@ -26,6 +27,7 @@ namespace VotingSystem.Infrastructure
 
             #region Repos
             services.AddScoped<IPollRepository, PollRepository>();
+            services.AddScoped<IVoteRepository, VoteRepository>();
             #endregion
 
             return services;

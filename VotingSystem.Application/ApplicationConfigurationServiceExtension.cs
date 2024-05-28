@@ -18,6 +18,7 @@ namespace VotingSystem.Application
         {
             #region services
             services.AddScoped<IPollService, PollService>();
+            services.AddScoped<IVoteService, VotesService>();
             #endregion
             return services;
         }
