@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VotingSystem.Application.Abstractions.Services;
+using VotingSystem.Application.Services;
 
 namespace VotingSystem.Application
 {
@@ -14,6 +16,9 @@ namespace VotingSystem.Application
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            #region services
+            services.AddScoped<IPollService, PollService>();
+            #endregion
             return services;
         }
     }

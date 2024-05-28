@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VotingSystem.Infrastructure.Data.Context;
+using VotingSystem.Infrastructure.Repositories.Polls;
 
 namespace VotingSystem.Infrastructure
 {
@@ -21,6 +22,10 @@ namespace VotingSystem.Infrastructure
             var ConnectionString = configuration.GetConnectionString("VotingSystem");
             services.AddDbContext<VotingSystemContext>(options => options.UseSqlServer(ConnectionString));
 
+            #endregion
+
+            #region Repos
+            services.AddScoped<IPollRepository, PollRepository>();
             #endregion
 
             return services;

@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Abstractions\" />
+    <Folder Include="Services\Polls\" />
   </ItemGroup>
 
 </Project>

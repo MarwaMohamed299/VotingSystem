@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VotingSystem.Application;
+using VotingSystem.Application.Abstractions.Contracts;
 using VotingSystem.Infrastructure.Data.Context;
 
-namespace VotingSystem.Infrastructure.Repositories
+namespace VotingSystem.Infrastructure.Repositories.Generic
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-    
+
         private readonly VotingSystemContext _dbContext;
 
         public Repository(VotingSystemContext dbContext)

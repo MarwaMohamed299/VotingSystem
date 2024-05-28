@@ -4,17 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VotingSystem.Domain.Entities
+namespace VotingSystem.Application.Models.Options
 {
-    public class Option
+    public class OptionReadDto
     {
         public int OptionId { get; set; }
         public string Description { get; set; } = string.Empty;
-        //NavProp
-        public int PollId { get; set; }
-
-        public Poll? Poll { get; set; }
-        public ICollection<Vote> Votes { get; set; } = new List<Vote>();
-
     }
 }

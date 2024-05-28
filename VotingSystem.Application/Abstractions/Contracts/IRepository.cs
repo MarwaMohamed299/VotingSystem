@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VotingSystem.Application
+namespace VotingSystem.Application.Abstractions.Contracts
 {
     public interface IRepository<T> where T : class
     {
