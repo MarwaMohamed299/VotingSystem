@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VotingSystem.Application.Models.Options;
+using VotingSystem.Application.Models.Questions;
 using VotingSystem.Domain.Entities;
 
 namespace VotingSystem.Application.Models.Polls
@@ -14,7 +15,6 @@ namespace VotingSystem.Application.Models.Polls
         public string Title { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        //NavProp
-        public List<OptionReadDto> Options { get; set; } = new List<OptionReadDto>();
+        public List<QuestionReadDto> Questions { get; set; } = new List<QuestionReadDto>();
     }
 }

@@ -13,7 +13,8 @@ namespace VotingSystem.Domain.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         //NavProp
-        public List<Option> Options { get; set; } = new List<Option>();
+        public List<Question> Questions { get; set; } = new List<Question>();
+
 
     }
 }

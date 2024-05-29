@@ -37,12 +37,22 @@ namespace VotingSystem.Infrastructure.Repositories.Polls
         {
             await _context.Polls.FindAsync(id);
         }
-        public async Task<Poll> GetPollWithOptionsAsync(int pollId)
+        public async Task<Poll> GetPollWithQuestionsAsync(int pollId)
         {
-           var pollWitOptions = await _context.Polls.Include(p => p.Options)
+            var pollWitOptions = await _context.Polls
+                .Include(p => p.Questions)
+                .ThenInclude(a=>a.Options)
                 .FirstOrDefaultAsync(p => p.PollId == pollId);
             return pollWitOptions ?? null!;
         }
-
+        public async Task<Poll> GetVotesForEachPullAsync(int pollId)
+        {
+            var poll = await _context.Polls
+                .Include(p => p.Questions)
+                .ThenInclude(q => q.Options)
+                .ThenInclude(o => o.Votes)
+                .FirstOrDefaultAsync(p => p.PollId == pollId);
+            return poll ?? null!;
+        }
     }
 }

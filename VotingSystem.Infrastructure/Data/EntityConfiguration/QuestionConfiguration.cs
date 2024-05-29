@@ -10,12 +10,12 @@ using VotingSystem.Domain.Entities;
 
 namespace VotingSystem.Infrastructure.Data.EntityConfiguration;
 
-public class OptionsConfiguration : IEntityTypeConfiguration<Option>
+public class QuestionConfiguration : IEntityTypeConfiguration<Question>
 {
-    public void Configure(EntityTypeBuilder<Option> builder)
+    public void Configure(EntityTypeBuilder<Question> builder)
     {
-        builder.HasOne(o => o.Question)
-                        .WithMany(q => q.Options)
-                        .HasForeignKey(o => o.QuestionId);
+        builder.HasOne(q => q.Poll)
+                        .WithMany(p => p.Questions)
+                        .HasForeignKey(q => q.PollId);
     }
 }

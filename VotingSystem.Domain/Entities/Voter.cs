@@ -9,8 +9,7 @@ namespace VotingSystem.Domain.Entities
     public class Voter 
     {
         public int Id { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public bool hasSubmitted { get; set; }
 
         //NavProp
         public Guid UserId { get; set; } 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,5 +23,6 @@ namespace VotingSystem.Infrastructure.Repositories.Votes
             await _context.Votes.AddAsync(vote);
             await _context.SaveChangesAsync();
         }
+        
     }
 }

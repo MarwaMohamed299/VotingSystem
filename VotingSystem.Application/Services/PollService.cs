@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using VotingSystem.Application.Abstractions.Services;
 using VotingSystem.Application.Models.Options;
 using VotingSystem.Application.Models.Polls;
+using VotingSystem.Application.Models.Questions;
+using VotingSystem.Domain.Entities;
 using VotingSystem.Infrastructure.Repositories;
 using VotingSystem.Infrastructure.Repositories.Polls;
 
@@ -19,28 +21,49 @@ namespace VotingSystem.Application.Services
         {
             _repo = repository;
         }
-        public async Task<PollReadDto?> GetPollWithOptionsAsync(int id)
+        public async Task<PollReadDto?> GetPollWithQuestionsAsync(int id)
         {
-            var pollWithOptions = await _repo.GetPollWithOptionsAsync(id);
-            if (pollWithOptions == null)
-            {
-                return null;
-            }
+            var pollWithQuestions = await _repo.GetPollWithQuestionsAsync(id);
 
             var pollDto = new PollReadDto
             {
-                PollId = pollWithOptions.PollId,
-                StartDate = pollWithOptions.StartDate,
-                EndDate = pollWithOptions.EndDate,
-                Title = pollWithOptions.Title,
-                Options = pollWithOptions.Options.Select(o => new OptionReadDto
+                PollId = pollWithQuestions.PollId,
+                StartDate = pollWithQuestions.StartDate,
+                EndDate = pollWithQuestions.EndDate,
+                Title = pollWithQuestions.Title,
+                Questions = pollWithQuestions.Questions.Select(q => new QuestionReadDto
                 {
-                    OptionId = o.OptionId,
-                   Description = o.Description
+                    QuestionId = q.QuestionId,
+                    Text = q.Text,
+                    Options = q.Options.Select(o => new OptionReadDto
+                    {
+                        OptionId = o.OptionId,
+                        Description = o.Description
+                    }).ToList()
                 }).ToList()
             };
 
             return pollDto;
         }
+
+        public async Task<List<PollQuestionDto>> GetVotesCountForOptionsAsync(int pollId)
+        {
+            var poll = await _repo.GetVotesForEachPullAsync(pollId);
+
+            var questionDtos = poll.Questions.Select(q => new PollQuestionDto
+            {
+                QuestionId = q.QuestionId,
+                Text = q.Text,
+                Options = q.Options.Select(o => new PollOptionsVoteCountDto
+                {
+                    OptionId = o.OptionId,
+                    Description = o.Description,
+                    VoteCount = o.Votes.Count
+                }).ToList()
+            }).ToList();
+
+            return questionDtos;
+        }
     }
 }
+

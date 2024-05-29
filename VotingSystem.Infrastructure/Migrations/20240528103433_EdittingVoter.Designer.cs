@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VotingSystem.Infrastructure.Data.Context;
 
@@ -11,9 +12,11 @@ using VotingSystem.Infrastructure.Data.Context;
 namespace VotingSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(VotingSystemContext))]
-    partial class VotingSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240528103433_EdittingVoter")]
+    partial class EdittingVoter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -137,12 +140,12 @@ namespace VotingSystem.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("QuestionId")
+                    b.Property<int>("PollId")
                         .HasColumnType("int");
 
                     b.HasKey("OptionId");
 
-                    b.HasIndex("QuestionId");
+                    b.HasIndex("PollId");
 
                     b.ToTable("Options");
 
@@ -151,37 +154,49 @@ namespace VotingSystem.Infrastructure.Migrations
                         {
                             OptionId = 1,
                             Description = "C#",
-                            QuestionId = 1
+                            PollId = 1
                         },
                         new
                         {
                             OptionId = 2,
                             Description = "Java",
-                            QuestionId = 1
+                            PollId = 1
                         },
                         new
                         {
                             OptionId = 3,
                             Description = "Python",
-                            QuestionId = 1
+                            PollId = 1
                         },
                         new
                         {
                             OptionId = 4,
                             Description = "JavaScript",
-                            QuestionId = 2
+                            PollId = 1
                         },
                         new
                         {
                             OptionId = 5,
-                            Description = "TypeScript",
-                            QuestionId = 2
+                            Description = "Visual Studio",
+                            PollId = 2
                         },
                         new
                         {
                             OptionId = 6,
-                            Description = "Dart",
-                            QuestionId = 2
+                            Description = "IntelliJ IDEA",
+                            PollId = 2
+                        },
+                        new
+                        {
+                            OptionId = 7,
+                            Description = "PyCharm",
+                            PollId = 2
+                        },
+                        new
+                        {
+                            OptionId = 8,
+                            Description = "VS Code",
+                            PollId = 2
                         });
                 });
 
@@ -211,45 +226,16 @@ namespace VotingSystem.Infrastructure.Migrations
                         new
                         {
                             PollId = 1,
-                            EndDate = new DateTime(2024, 5, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartDate = new DateTime(2024, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2024, 6, 7, 12, 34, 31, 854, DateTimeKind.Local).AddTicks(4359),
+                            StartDate = new DateTime(2024, 5, 28, 12, 34, 31, 854, DateTimeKind.Local).AddTicks(4347),
                             Title = "Favorite Programming Language"
-                        });
-                });
-
-            modelBuilder.Entity("VotingSystem.Domain.Entities.Question", b =>
-                {
-                    b.Property<int>("QuestionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuestionId"));
-
-                    b.Property<int>("PollId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("QuestionId");
-
-                    b.HasIndex("PollId");
-
-                    b.ToTable("Questions");
-
-                    b.HasData(
-                        new
-                        {
-                            QuestionId = 1,
-                            PollId = 1,
-                            Text = "What is your favorite backend language?"
                         },
                         new
                         {
-                            QuestionId = 2,
-                            PollId = 1,
-                            Text = "What is your favorite frontend language?"
+                            PollId = 2,
+                            EndDate = new DateTime(2024, 6, 7, 12, 34, 31, 854, DateTimeKind.Local).AddTicks(4368),
+                            StartDate = new DateTime(2024, 5, 28, 12, 34, 31, 854, DateTimeKind.Local).AddTicks(4367),
+                            Title = "Best IDE"
                         });
                 });
 
@@ -448,19 +434,8 @@ namespace VotingSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("VotingSystem.Domain.Entities.Option", b =>
                 {
-                    b.HasOne("VotingSystem.Domain.Entities.Question", "Question")
-                        .WithMany("Options")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Question");
-                });
-
-            modelBuilder.Entity("VotingSystem.Domain.Entities.Question", b =>
-                {
                     b.HasOne("VotingSystem.Domain.Entities.Poll", "Poll")
-                        .WithMany("Questions")
+                        .WithMany("Options")
                         .HasForeignKey("PollId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -491,11 +466,6 @@ namespace VotingSystem.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("VotingSystem.Domain.Entities.Poll", b =>
-                {
-                    b.Navigation("Questions");
-                });
-
-            modelBuilder.Entity("VotingSystem.Domain.Entities.Question", b =>
                 {
                     b.Navigation("Options");
                 });
