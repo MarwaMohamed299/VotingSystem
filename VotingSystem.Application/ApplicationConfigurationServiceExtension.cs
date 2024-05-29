@@ -20,6 +20,7 @@ namespace VotingSystem.Application
             services.AddScoped<IPollService, PollService>();
             services.AddScoped<IVoteService, VotesService>();
             #endregion
+            
             return services;
         }
     }

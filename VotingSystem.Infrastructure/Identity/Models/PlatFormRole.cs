@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VotingSystem.Infrastructure.Identity
+namespace VotingSystem.Infrastructure.Identity.Models
 {
     public class PlatFormRole : IdentityRole<Guid>
     {

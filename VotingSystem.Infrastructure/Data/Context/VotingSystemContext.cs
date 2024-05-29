@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VotingSystem.Domain.Entities;
-using VotingSystem.Infrastructure.Identity;
+using VotingSystem.Infrastructure.Identity.Models;
 
 namespace VotingSystem.Infrastructure.Data.Context
 {

@@ -3,6 +3,12 @@ using Serilog;
 using VotingSystem.Domain.Entities;
 using VotingSystem.Infrastructure;
 using VotingSystem.Application;
+using Microsoft.AspNetCore.Identity;
+using VotingSystem.Infrastructure.Data.Context;
+using VotingSystem.Infrastructure.Identity.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +43,43 @@ try
     builder.Services.AddProblemDetails();
     #endregion
 
+    #region Identity
+    builder.Services.AddIdentity<PlatFormUser, PlatFormRole>(options =>
+    {
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 5;
+        options.User.RequireUniqueEmail = true;
+        options.Lockout.MaxFailedAccessAttempts = 3;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+    })
+        .AddEntityFrameworkStores<VotingSystemContext>()
+        .AddDefaultTokenProviders();
+
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        var secretKey = builder.Configuration.GetValue<string>("SecretKey");
+        var secretKeyInBytes = Encoding.ASCII.GetBytes(secretKey!);
+        var signingKey = new SymmetricSecurityKey(secretKeyInBytes);
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            IssuerSigningKey = signingKey,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true
+        };
+    });
+
+    #endregion
+
     #region CORS Policy
     builder.Services.AddCors(options =>
     {
@@ -61,7 +104,7 @@ try
 
 
     app.UseHttpsRedirection();
-
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.UseCors("AllowAllDomains");

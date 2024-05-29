@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VotingSystem.Application.Abstractions.Services;
 using VotingSystem.Infrastructure.Data.Context;
+using VotingSystem.Infrastructure.Identity.UserService;
 using VotingSystem.Infrastructure.Repositories.Polls;
 using VotingSystem.Infrastructure.Repositories.Votes;
 
@@ -28,6 +30,10 @@ namespace VotingSystem.Infrastructure
             #region Repos
             services.AddScoped<IPollRepository, PollRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
+            #endregion
+
+            #region Identity
+            services.AddScoped<IUserService, UserService>();
             #endregion
 
             return services;
