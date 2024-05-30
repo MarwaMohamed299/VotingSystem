@@ -9,5 +9,8 @@ namespace VotingSystem.Infrastructure.Identity.Models
 {
     public class PlatFormUser : IdentityUser<Guid>
     {
+        public string? RefreshToken { get; set; }
+        public DateTime ExpiryDate { get; set; }
+        public bool IsActive { get; set; } 
     }
 }

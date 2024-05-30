@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VotingSystem.Application.Abstractions.Services;
 using VotingSystem.Application.Models.Votes;
@@ -16,6 +17,7 @@ namespace VotingSystem.API.Controllers
         {
             _service = service;
         }
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<VoteAddDto>> AddVote(VoteAddDto vote)
         {

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using VotingSystem.Application.Abstractions.Services;
@@ -35,6 +36,9 @@ namespace VotingSystem.Infrastructure.Identity.UserService
             {
                 UserName = userFromRequest.UserName,
                 Email = userFromRequest.Email,
+                RefreshToken = null,
+                ExpiryDate = DateTime.MinValue,
+                IsActive = false
             };
             var RegisterResult = await _userManger.CreateAsync(user, userFromRequest.Password);
             if (!RegisterResult.Succeeded)
@@ -57,6 +61,7 @@ namespace VotingSystem.Infrastructure.Identity.UserService
                 var Voter = new Voter
                 {
                     hasSubmitted = false,
+                    UserId = user.Id
                 };
                 await _votingSystemContext.AddAsync(Voter);
                 var res = await _votingSystemContext.SaveChangesAsync();
@@ -64,7 +69,7 @@ namespace VotingSystem.Infrastructure.Identity.UserService
                 {
                     return new RegisterResultDto
                     {
-                        Success = false
+                        Success = true
                     };
                 }
                 else
@@ -74,58 +79,83 @@ namespace VotingSystem.Infrastructure.Identity.UserService
                 }
             }
         }
-
         public async Task<LoginResultDto> LogIn(LoginDto credentials)
         {
             LoginResultDto resultDto = new LoginResultDto();
 
-            var User = await _userManger.FindByNameAsync(credentials.UserName);
-            if (User == null)
+            var user = await _userManger.FindByNameAsync(credentials.UserName);
+            if (user == null)
             {
                 resultDto.IsSuccess = false;
                 resultDto.Message = "User Name Or Password Isn't Correct";
                 return resultDto;
             }
-            if (await _userManger.IsLockedOutAsync(User))
+            if (await _userManger.IsLockedOutAsync(user))
             {
                 resultDto.IsSuccess = false;
                 resultDto.Message = "User Is Locked, Try again after 10 minutes";
                 return resultDto;
             }
-            if (!(await _userManger.CheckPasswordAsync(User, credentials.Password)))
+            if (!(await _userManger.CheckPasswordAsync(user, credentials.Password)))
             {
-                await _userManger.AccessFailedAsync(User);
+                await _userManger.AccessFailedAsync(user);
                 resultDto.IsSuccess = false;
                 resultDto.Message = "User Name Or Password Isn't Correct";
                 return resultDto;
             }
 
-            //Key Generation
+            // Key Generation
+            var secretKey = _config["SecretKey"];
+            var secretKeyInBytes = Encoding.ASCII.GetBytes(secretKey!);
+            var key = new SymmetricSecurityKey(secretKeyInBytes);
+            // Hashing 
+            var generatingToken = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+            var userClaims = await _userManger.GetClaimsAsync(user);
 
-            var SecretKey = _config["SecretKey"];
-            var secretKeyInBytes = Encoding.ASCII.GetBytes(SecretKey!);
-            var Key = new SymmetricSecurityKey(secretKeyInBytes);
-            //Hashing 
-            var generatingToken = new SigningCredentials(Key, SecurityAlgorithms.HmacSha256Signature);
-            var userClaims = await _userManger.GetClaimsAsync(User);
-
-            //Generate token
-            var jwt = new JwtSecurityToken
-                (
-                    claims: userClaims,
-                    notBefore: DateTime.Now,
-                    expires: DateTime.Now.AddMinutes(10),
-                    signingCredentials: generatingToken
-                );
+            // Generate token
+            var jwt = new JwtSecurityToken(
+                claims: userClaims,
+                notBefore: DateTime.Now,
+                expires: DateTime.Now.AddMinutes(1),
+                signingCredentials: generatingToken
+            );
             var tokenHandler = new JwtSecurityTokenHandler();
             string tokenString = tokenHandler.WriteToken(jwt);
             resultDto.IsSuccess = true;
             resultDto.Message = "Login Successfully";
             resultDto.Token = tokenString;
             resultDto.ExpiryDate = jwt.ValidTo;
+
+            // Refresh token handling
+            if (!string.IsNullOrEmpty(user.RefreshToken) && user.ExpiryDate > DateTime.Now && user.IsActive)
+            {
+                // There is an active refresh token
+                resultDto.RefreshToken = user.RefreshToken;
+            }
+            else
+            {
+                // Generate and save a new refresh token
+                var refreshTokenString = GenerateRefreshTokenString();
+                user.RefreshToken = refreshTokenString;
+                user.ExpiryDate = DateTime.Now.AddDays(7);
+                user.IsActive = true;
+
+                await _userManger.UpdateAsync(user);
+
+                resultDto.RefreshToken = refreshTokenString;
+            }
+
             return resultDto;
+        }
 
-
+        private string GenerateRefreshTokenString()
+        {
+            var random = new byte[64];
+            using (var numberGenerator = RandomNumberGenerator.Create())
+            {
+                numberGenerator.GetBytes(random);
+            }
+            return Convert.ToBase64String(random);
         }
 
     }

@@ -74,7 +74,8 @@ try
             ValidateAudience = false,
             IssuerSigningKey = signingKey,
             ValidateIssuerSigningKey = true,
-            ValidateLifetime = true
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
         };
     });
 
