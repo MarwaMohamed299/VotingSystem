@@ -6,6 +6,6 @@ namespace VotingSystem.Application.Abstractions.Services
     public interface IUserService
     {
         Task<LoginResultDto> LogIn(LoginDto credentials);
-        Task<IEnumerable<IdentityError>> Register(RegisterDto userFromRequest);
+        Task<RegisterResultDto> Register(RegisterDto userFromRequest);
     }
 }

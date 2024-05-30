@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VotingSystem.Application.Abstractions.Services;
 using VotingSystem.Application.Models.Identity;
+using VotingSystem.Domain.Entities;
 using VotingSystem.Infrastructure.Data.Context;
 using VotingSystem.Infrastructure.Identity.Models;
 
@@ -28,7 +29,7 @@ namespace VotingSystem.Infrastructure.Identity.UserService
             _config = configuration;
         }
 
-        public async Task<IEnumerable<IdentityError>> Register(RegisterDto userFromRequest)
+        public async Task<RegisterResultDto> Register(RegisterDto userFromRequest)
         {
             PlatFormUser user = new PlatFormUser
             {
@@ -38,19 +39,39 @@ namespace VotingSystem.Infrastructure.Identity.UserService
             var RegisterResult = await _userManger.CreateAsync(user, userFromRequest.Password);
             if (!RegisterResult.Succeeded)
             {
-                return RegisterResult.Errors;
+                return new RegisterResultDto
+                {
+                    Success = false
+                };
             }
             else
             {
                 var userClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name,userFromRequest.UserName),
-                //new Claim (ClaimTypes.NameIdentifier,user.Id),
+                new Claim (ClaimTypes.NameIdentifier,user.Id.ToString()),
                 new Claim(ClaimTypes.Email, userFromRequest.Email),
                 new Claim("Nationality", "Egyptian"),
             };
                 await _userManger.AddClaimsAsync(user, userClaims);
-                return null!;
+                var Voter = new Voter
+                {
+                    hasSubmitted = false,
+                };
+                await _votingSystemContext.AddAsync(Voter);
+                var res = await _votingSystemContext.SaveChangesAsync();
+                if (res > 0)
+                {
+                    return new RegisterResultDto
+                    {
+                        Success = false
+                    };
+                }
+                else
+                {
+                    await _userManger.DeleteAsync(user);
+                    return null!;
+                }
             }
         }
 
@@ -83,7 +104,6 @@ namespace VotingSystem.Infrastructure.Identity.UserService
 
             var SecretKey = _config["SecretKey"];
             var secretKeyInBytes = Encoding.ASCII.GetBytes(SecretKey!);
-
             var Key = new SymmetricSecurityKey(secretKeyInBytes);
             //Hashing 
             var generatingToken = new SigningCredentials(Key, SecurityAlgorithms.HmacSha256Signature);
