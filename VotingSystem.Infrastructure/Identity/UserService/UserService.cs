@@ -118,7 +118,7 @@ namespace VotingSystem.Infrastructure.Identity.UserService
             resultDto.IsSuccess = true;
             resultDto.Message = "Login Successfully";
             resultDto.Token = token.TokenString;
-            resultDto.ExpiryDate = token.ExpiryDate;
+            resultDto.RefreshTokenExpiryDate = token.ExpiryDate;
 
             if (!string.IsNullOrEmpty(user.RefreshToken) && user.ExpiryDate > DateTime.Now && user.IsActive)
             {
@@ -135,6 +135,7 @@ namespace VotingSystem.Infrastructure.Identity.UserService
                 resultDto.RefreshToken = refreshTokenString;
             }
 
+           //cookies
             SetRefreshTokenInCookie(resultDto.RefreshToken, user.ExpiryDate);
 
             return resultDto;
@@ -161,7 +162,7 @@ namespace VotingSystem.Infrastructure.Identity.UserService
             return (tokenString, jwt.ValidTo);
         }
 
-        private string GenerateRefreshTokenString()
+        private  string GenerateRefreshTokenString()
         {
             var random = new byte[64];
             using (var numberGenerator = RandomNumberGenerator.Create())
@@ -176,7 +177,7 @@ namespace VotingSystem.Infrastructure.Identity.UserService
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires = expiryDate
+                Expires = expiryDate 
             };
 
             _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
