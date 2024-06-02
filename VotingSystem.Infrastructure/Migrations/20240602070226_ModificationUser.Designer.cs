@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VotingSystem.Infrastructure.Data.Context;
 
@@ -11,9 +12,11 @@ using VotingSystem.Infrastructure.Data.Context;
 namespace VotingSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(VotingSystemContext))]
-    partial class VotingSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240602070226_ModificationUser")]
+    partial class ModificationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
