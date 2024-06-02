@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -19,15 +20,17 @@ namespace VotingSystem.Infrastructure.Identity.UserService
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<PlatFormUser> _userManger;
+        private readonly UserManager<PlatFormUser> _userManager;
         private readonly VotingSystemContext _votingSystemContext;
         private readonly IConfiguration _config;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(UserManager<PlatFormUser> userManager, VotingSystemContext votingSystemContextt, IConfiguration configuration)
+        public UserService(UserManager<PlatFormUser> userManager, VotingSystemContext votingSystemContext, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
-            _userManger = userManager;
-            _votingSystemContext = votingSystemContextt;
+            _userManager = userManager;
+            _votingSystemContext = votingSystemContext;
             _config = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<RegisterResultDto> Register(RegisterDto userFromRequest)
@@ -36,116 +39,126 @@ namespace VotingSystem.Infrastructure.Identity.UserService
             {
                 UserName = userFromRequest.UserName,
                 Email = userFromRequest.Email,
-                RefreshToken = null,
-                ExpiryDate = DateTime.MinValue,
-                IsActive = false
             };
-            var RegisterResult = await _userManger.CreateAsync(user, userFromRequest.Password);
-            if (!RegisterResult.Succeeded)
+            var registerResult = await _userManager.CreateAsync(user, userFromRequest.Password);
+            if (!registerResult.Succeeded)
             {
                 return new RegisterResultDto
                 {
                     Success = false
                 };
             }
-            else
+
+            var userClaims = new List<Claim>
             {
-                var userClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name,userFromRequest.UserName),
-                new Claim (ClaimTypes.NameIdentifier,user.Id.ToString()),
+                new Claim(ClaimTypes.Name, userFromRequest.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, userFromRequest.Email),
                 new Claim("Nationality", "Egyptian"),
             };
-                await _userManger.AddClaimsAsync(user, userClaims);
-                var Voter = new Voter
+            await _userManager.AddClaimsAsync(user, userClaims);
+
+            var voter = new Voter
+            {
+                hasSubmitted = false,
+                UserId = user.Id
+            };
+            await _votingSystemContext.AddAsync(voter);
+            var res = await _votingSystemContext.SaveChangesAsync();
+            if (res > 0)
+            {
+                return new RegisterResultDto
                 {
-                    hasSubmitted = false,
-                    UserId = user.Id
+                    Success = true
                 };
-                await _votingSystemContext.AddAsync(Voter);
-                var res = await _votingSystemContext.SaveChangesAsync();
-                if (res > 0)
-                {
-                    return new RegisterResultDto
-                    {
-                        Success = true
-                    };
-                }
-                else
-                {
-                    await _userManger.DeleteAsync(user);
-                    return null!;
-                }
             }
+
+            await _userManager.DeleteAsync(user);
+            return new RegisterResultDto { Success = false };
         }
+
         public async Task<LoginResultDto> LogIn(LoginDto credentials)
         {
-            LoginResultDto resultDto = new LoginResultDto();
+            var resultDto = new LoginResultDto();
 
-            var user = await _userManger.FindByNameAsync(credentials.UserName);
-            if (user == null)
+            var user = await _userManager.FindByNameAsync(credentials.UserName);
+            if (user == null || await _userManager.IsLockedOutAsync(user) || !await _userManager.CheckPasswordAsync(user, credentials.Password))
             {
                 resultDto.IsSuccess = false;
-                resultDto.Message = "User Name Or Password Isn't Correct";
-                return resultDto;
-            }
-            if (await _userManger.IsLockedOutAsync(user))
-            {
-                resultDto.IsSuccess = false;
-                resultDto.Message = "User Is Locked, Try again after 10 minutes";
-                return resultDto;
-            }
-            if (!(await _userManger.CheckPasswordAsync(user, credentials.Password)))
-            {
-                await _userManger.AccessFailedAsync(user);
-                resultDto.IsSuccess = false;
-                resultDto.Message = "User Name Or Password Isn't Correct";
+                resultDto.Message = user == null || !await _userManager.CheckPasswordAsync(user, credentials.Password) ? "User Name Or Password Isn't Correct" : "User Is Locked, Try again after 10 minutes";
+                if (user != null && !await _userManager.CheckPasswordAsync(user, credentials.Password))
+                {
+                    await _userManager.AccessFailedAsync(user);
+                }
                 return resultDto;
             }
 
-            // Key Generation
+            return await GenerateTokensForUser(user);
+        }
+
+        public async Task<LoginResultDto> RefreshToken(string refreshToken)
+        {
+            var resultDto = new LoginResultDto();
+            var user = _userManager.Users.SingleOrDefault(u => u.RefreshToken == refreshToken);
+
+            if (user == null || user.IsExpired)
+            {
+                resultDto.IsSuccess = false;
+                resultDto.Message = "Invalid refresh token";
+                return resultDto;
+            }
+
+            return await GenerateTokensForUser(user);
+        }
+
+        private async Task<LoginResultDto> GenerateTokensForUser(PlatFormUser user)
+        {
+            var resultDto = new LoginResultDto();
+            var token = GenerateJwtToken(user);
+            resultDto.IsSuccess = true;
+            resultDto.Message = "Login Successfully";
+            resultDto.Token = token.TokenString;
+            resultDto.ExpiryDate = token.ExpiryDate;
+
+            if (!string.IsNullOrEmpty(user.RefreshToken) && user.ExpiryDate > DateTime.Now && user.IsActive)
+            {
+                resultDto.RefreshToken = user.RefreshToken;
+            }
+            else
+            {
+                var refreshTokenString = GenerateRefreshTokenString();
+                user.RefreshToken = refreshTokenString;
+                user.ExpiryDate = DateTime.Now.AddDays(7);
+                user.CreatedOn = DateTime.Now;
+
+                await _userManager.UpdateAsync(user);
+                resultDto.RefreshToken = refreshTokenString;
+            }
+
+            SetRefreshTokenInCookie(resultDto.RefreshToken, user.ExpiryDate);
+
+            return resultDto;
+        }
+
+        private (string TokenString, DateTime ExpiryDate) GenerateJwtToken(PlatFormUser user)
+        {
             var secretKey = _config["SecretKey"];
             var secretKeyInBytes = Encoding.ASCII.GetBytes(secretKey!);
             var key = new SymmetricSecurityKey(secretKeyInBytes);
-            // Hashing 
             var generatingToken = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-            var userClaims = await _userManger.GetClaimsAsync(user);
+            var userClaims = _userManager.GetClaimsAsync(user).Result;
 
-            // Generate token
             var jwt = new JwtSecurityToken(
                 claims: userClaims,
                 notBefore: DateTime.Now,
                 expires: DateTime.Now.AddMinutes(1),
                 signingCredentials: generatingToken
             );
+
             var tokenHandler = new JwtSecurityTokenHandler();
             string tokenString = tokenHandler.WriteToken(jwt);
-            resultDto.IsSuccess = true;
-            resultDto.Message = "Login Successfully";
-            resultDto.Token = tokenString;
-            resultDto.ExpiryDate = jwt.ValidTo;
 
-            // Refresh token handling
-            if (!string.IsNullOrEmpty(user.RefreshToken) && user.ExpiryDate > DateTime.Now && user.IsActive)
-            {
-                // There is an active refresh token
-                resultDto.RefreshToken = user.RefreshToken;
-            }
-            else
-            {
-                // Generate and save a new refresh token
-                var refreshTokenString = GenerateRefreshTokenString();
-                user.RefreshToken = refreshTokenString;
-                user.ExpiryDate = DateTime.Now.AddDays(7);
-                user.IsActive = true;
-
-                await _userManger.UpdateAsync(user);
-
-                resultDto.RefreshToken = refreshTokenString;
-            }
-
-            return resultDto;
+            return (tokenString, jwt.ValidTo);
         }
 
         private string GenerateRefreshTokenString()
@@ -158,5 +171,15 @@ namespace VotingSystem.Infrastructure.Identity.UserService
             return Convert.ToBase64String(random);
         }
 
+        private void SetRefreshTokenInCookie(string refreshToken, DateTime expiryDate)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = expiryDate
+            };
+
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        }
     }
 }
