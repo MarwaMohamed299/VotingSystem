@@ -36,6 +36,7 @@ namespace VotingSystem.API.Controllers
         {
             var result = await _userService.RefreshToken(refreshToken);
             return Ok(result);
+
         }
     }
 }
