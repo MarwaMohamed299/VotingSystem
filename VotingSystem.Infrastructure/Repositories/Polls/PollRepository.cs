@@ -28,14 +28,24 @@ namespace VotingSystem.Infrastructure.Repositories.Polls
             _context.Polls.Update(poll);
             await _context.SaveChangesAsync();
         }
-        public async Task DeletePollAsync(Poll poll)
+        public async Task DeletePollAsync(int id)
         {
+            var poll = await GetPollByIdAsync(id);
+
+            _context.Options.RemoveRange(poll!.Questions.SelectMany(q => q.Options));
+
+            _context.Questions.RemoveRange(poll.Questions);
+
             _context.Polls.Remove(poll);
+
             await _context.SaveChangesAsync();
         }
-        public async Task GetPollByIdAsync(int id)
+        public async Task<Poll?> GetPollByIdAsync(int id)
         {
-            await _context.Polls.FindAsync(id);
+            return await _context.Polls
+                                     .Include(p => p.Questions)
+                                     .ThenInclude(q => q.Options)
+                                     .FirstOrDefaultAsync(p => p.PollId == id);
         }
         public async Task<Poll> GetPollWithQuestionsAsync(int pollId)
         {

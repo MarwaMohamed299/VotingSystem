@@ -13,7 +13,7 @@ namespace VotingSystem.Infrastructure.Identity.Models
         public DateTime ExpiryDate { get; set; }
         public bool IsExpired => DateTime.Now >= ExpiryDate;
         public DateTime CreatedOn { get; set; }
-        public DateTime? RevokedOn { get; set;  }
-        public bool IsActive  => RevokedOn == null && !IsExpired;
+        public DateTime? RevokedOn { get; set; }
+        public bool IsActive => RevokedOn == null && !IsExpired;
     }
 }

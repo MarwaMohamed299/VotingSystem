@@ -64,6 +64,53 @@ namespace VotingSystem.Application.Services
 
             return questionDtos;
         }
+
+        public async Task<PollAddDto> AddPollAsync(PollAddDto pollDto)
+        {
+            var poll = new Poll
+            {
+                Title = pollDto.Title,
+                StartDate = pollDto.StartDate,
+                EndDate = pollDto.EndDate,
+                Questions = pollDto.Questions.Select(q => new Question
+                {
+                    Text = q.Text,
+                    Options = q.options.Select(o => new Option
+                    {
+                        Description=o.Description
+                    }).ToList()
+                }).ToList()
+            };
+            await _repo.CreatePollAsync(poll);
+            return pollDto;
+        }
+
+        public async Task<PollUpdateDto> UpdatePollAsync(PollUpdateDto pollDto, int id)
+        {
+            var poll = await _repo.GetPollByIdAsync(id);
+
+            poll!.Title = pollDto.Title;
+            poll.StartDate = pollDto.StartDate;
+            poll.EndDate = pollDto.EndDate;
+            poll.Questions = pollDto.Questions.Select(q => new Question
+            {
+                Text = q.Text,
+                Options = q.Options.Select(o => new Option
+                {
+                    Description = o.Description
+                }).ToList()
+            }).ToList();
+
+
+            await _repo.UpdatePollAsync(poll);
+            return pollDto;
+        }
+        public async Task DeletePollAsync(int id)
+        {
+            var poll = await _repo.GetPollByIdAsync(id);
+            await _repo.DeletePollAsync(id);
+
+        } 
     }
 }
 

@@ -12,7 +12,7 @@ namespace VotingSystem.Application.Models.Identity
         public bool IsSuccess { get; set; }
         public string? Message { get; set; }
         public string? Token { get; set; }
-        public DateTime? ExpiryDate { get; set; }
-        public string? RefreshToken { get; set; } 
+        public DateTime? RefreshTokenExpiryDate { get; set; }
+        public string? RefreshToken { get; set; }
     }
 }
