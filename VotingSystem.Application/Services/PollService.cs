@@ -89,12 +89,28 @@ namespace VotingSystem.Application.Services
         {
             var poll = await _repo.GetPollByIdAsync(id);
 
-            poll.Title = pollDto.Title;
+            poll!.Title = pollDto.Title;
+            poll.StartDate = pollDto.StartDate;
+            poll.EndDate = pollDto.EndDate;
+            poll.Questions = pollDto.Questions.Select(q => new Question
+            {
+                Text = q.Text,
+                Options = q.Options.Select(o => new Option
+                {
+                    Description = o.Description
+                }).ToList()
+            }).ToList();
 
 
             await _repo.UpdatePollAsync(poll);
-
+            return pollDto;
         }
+        public async Task DeletePollAsync(int id)
+        {
+            var poll = await _repo.GetPollByIdAsync(id);
+            await _repo.DeletePollAsync(id);
+
+        } 
     }
 }
 

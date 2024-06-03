@@ -13,5 +13,8 @@ namespace VotingSystem.Application.Abstractions.Services
     {
         Task<PollReadDto?> GetPollWithQuestionsAsync(int id);
         Task<List<PollQuestionDto>> GetVotesCountForOptionsAsync(int pollId);
+        Task<PollAddDto> AddPollAsync(PollAddDto pollDto);
+        Task<PollUpdateDto> UpdatePollAsync(PollUpdateDto pollDto, int id);
+        Task DeletePollAsync(int id);
     }
 }

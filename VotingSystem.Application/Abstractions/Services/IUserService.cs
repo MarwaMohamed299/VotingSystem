@@ -7,5 +7,7 @@ namespace VotingSystem.Application.Abstractions.Services
     {
         Task<LoginResultDto> LogIn(LoginDto credentials);
         Task<RegisterResultDto> Register(RegisterDto userFromRequest);
+        Task<LoginResultDto> RefreshToken(string refreshToken);
+
     }
 }
