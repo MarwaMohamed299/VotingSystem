@@ -6,7 +6,7 @@ namespace VotingSystem.Infrastructure.Repositories.Polls
     {
         Task CreatePollAsync(Poll poll);
         Task DeletePollAsync(Poll poll);
-        Task GetPollByIdAsync(int id);
+        Task<Poll?> GetPollByIdAsync(int id);
         Task<Poll> GetPollWithQuestionsAsync(int pollId);
         Task UpdatePollAsync(Poll poll);
         Task<Poll> GetVotesForEachPullAsync(int pollId);

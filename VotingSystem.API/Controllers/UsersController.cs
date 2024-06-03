@@ -23,7 +23,6 @@ namespace VotingSystem.API.Controllers
             return Ok(result);
 
         }
-
         [HttpPost]
         [Route("Login")]
         public async Task<ActionResult<LoginResultDto>> Login(LoginDto credentials)
@@ -31,6 +30,12 @@ namespace VotingSystem.API.Controllers
             var result = await _userService.LogIn(credentials);
             return Ok(result);
 
+        }
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        {
+            var result = await _userService.RefreshToken(refreshToken);
+            return Ok(result);
         }
     }
 }

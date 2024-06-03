@@ -33,9 +33,9 @@ namespace VotingSystem.Infrastructure.Repositories.Polls
             _context.Polls.Remove(poll);
             await _context.SaveChangesAsync();
         }
-        public async Task GetPollByIdAsync(int id)
+        public async Task<Poll?> GetPollByIdAsync(int id)
         {
-            await _context.Polls.FindAsync(id);
+           return await _context.Polls.FindAsync(id);
         }
         public async Task<Poll> GetPollWithQuestionsAsync(int pollId)
         {
