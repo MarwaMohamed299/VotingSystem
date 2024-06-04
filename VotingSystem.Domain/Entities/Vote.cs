@@ -9,7 +9,7 @@ namespace VotingSystem.Domain.Entities
     public class Vote
     {
         public int VoteId { get; set; }
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public int OptionId { get; set; }
         public DateTime VoteDate { get; set; }
         //NavProp
