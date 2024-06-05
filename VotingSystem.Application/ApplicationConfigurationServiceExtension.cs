@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace VotingSystem.Application
             services.AddScoped<IPollService, PollService>();
             services.AddScoped<IVoteService, VotesService>();
             #endregion
-            
+            services.AddHttpContextAccessor();
             return services;
         }
     }

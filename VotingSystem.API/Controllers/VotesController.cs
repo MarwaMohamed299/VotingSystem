@@ -17,7 +17,7 @@ namespace VotingSystem.API.Controllers
         {
             _service = service;
         }
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         public async Task<ActionResult<VoteAddDto>> AddVote(VoteAddDto vote)
         {
