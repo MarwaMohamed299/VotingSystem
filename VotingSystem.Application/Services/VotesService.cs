@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,18 +14,25 @@ namespace VotingSystem.Application.Services
     public class VotesService : IVoteService
     {
         private readonly IVoteRepository _repo;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public VotesService(IVoteRepository  repo)
+        public VotesService(IVoteRepository  repo , IHttpContextAccessor contextAccessor)
         {
             _repo = repo;
+            _contextAccessor = contextAccessor;
         }
         public async Task<VoteAddDto> AddAsync(VoteAddDto voteAddDto)
         {
+            var sessionId = Guid.NewGuid().ToString();
+
+            _contextAccessor.HttpContext.Response.Cookies.Append("sessionid", sessionId);
+
             var vote = new Vote
             {
                 OptionId = voteAddDto.OptionId,
-                UserId = voteAddDto.VoterId,
-                VoteDate = voteAddDto.VoteDate
+                VoterId = voteAddDto.VoterId,
+                VoteDate = voteAddDto.VoteDate,
+                SessionIdentifier = sessionId
             };
             await _repo.AddAsync(vote);
             return voteAddDto;

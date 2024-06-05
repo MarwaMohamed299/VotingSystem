@@ -12,8 +12,8 @@ using VotingSystem.Infrastructure.Data.Context;
 namespace VotingSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(VotingSystemContext))]
-    [Migration("20240602070226_ModificationUser")]
-    partial class ModificationUser
+    [Migration("20240605124304_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -267,8 +267,12 @@ namespace VotingSystem.Infrastructure.Migrations
                     b.Property<int>("OptionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("VoteDate")
                         .HasColumnType("datetime2");

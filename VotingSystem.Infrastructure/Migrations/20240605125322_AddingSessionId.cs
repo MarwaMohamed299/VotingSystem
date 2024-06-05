@@ -5,24 +5,24 @@
 namespace VotingSystem.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class MakingIsActive : Migration
+    public partial class AddingSessionId : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "IsRevoked",
-                table: "AspNetUsers",
-                newName: "IsActive");
+                name: "SessionId",
+                table: "Votes",
+                newName: "SessionIdentifier");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "IsActive",
-                table: "AspNetUsers",
-                newName: "IsRevoked");
+                name: "SessionIdentifier",
+                table: "Votes",
+                newName: "SessionId");
         }
     }
 }

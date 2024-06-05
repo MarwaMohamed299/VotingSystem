@@ -23,6 +23,6 @@ namespace VotingSystem.Infrastructure.Repositories.Votes
             await _context.Votes.AddAsync(vote);
             await _context.SaveChangesAsync();
         }
-        
+       
     }
 }

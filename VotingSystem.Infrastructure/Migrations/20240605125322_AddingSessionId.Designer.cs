@@ -12,8 +12,8 @@ using VotingSystem.Infrastructure.Data.Context;
 namespace VotingSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(VotingSystemContext))]
-    [Migration("20240527103808_AddingIdentity")]
-    partial class AddingIdentity
+    [Migration("20240605125322_AddingSessionId")]
+    partial class AddingSessionId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,14 +140,52 @@ namespace VotingSystem.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PollId")
+                    b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
                     b.HasKey("OptionId");
 
-                    b.HasIndex("PollId");
+                    b.HasIndex("QuestionId");
 
                     b.ToTable("Options");
+
+                    b.HasData(
+                        new
+                        {
+                            OptionId = 1,
+                            Description = "C#",
+                            QuestionId = 1
+                        },
+                        new
+                        {
+                            OptionId = 2,
+                            Description = "Java",
+                            QuestionId = 1
+                        },
+                        new
+                        {
+                            OptionId = 3,
+                            Description = "Python",
+                            QuestionId = 1
+                        },
+                        new
+                        {
+                            OptionId = 4,
+                            Description = "JavaScript",
+                            QuestionId = 2
+                        },
+                        new
+                        {
+                            OptionId = 5,
+                            Description = "TypeScript",
+                            QuestionId = 2
+                        },
+                        new
+                        {
+                            OptionId = 6,
+                            Description = "Dart",
+                            QuestionId = 2
+                        });
                 });
 
             modelBuilder.Entity("VotingSystem.Domain.Entities.Poll", b =>
@@ -171,6 +209,51 @@ namespace VotingSystem.Infrastructure.Migrations
                     b.HasKey("PollId");
 
                     b.ToTable("Polls");
+
+                    b.HasData(
+                        new
+                        {
+                            PollId = 1,
+                            EndDate = new DateTime(2024, 5, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StartDate = new DateTime(2024, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Favorite Programming Language"
+                        });
+                });
+
+            modelBuilder.Entity("VotingSystem.Domain.Entities.Question", b =>
+                {
+                    b.Property<int>("QuestionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuestionId"));
+
+                    b.Property<int>("PollId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("QuestionId");
+
+                    b.HasIndex("PollId");
+
+                    b.ToTable("Questions");
+
+                    b.HasData(
+                        new
+                        {
+                            QuestionId = 1,
+                            PollId = 1,
+                            Text = "What is your favorite backend language?"
+                        },
+                        new
+                        {
+                            QuestionId = 2,
+                            PollId = 1,
+                            Text = "What is your favorite frontend language?"
+                        });
                 });
 
             modelBuilder.Entity("VotingSystem.Domain.Entities.Vote", b =>
@@ -184,8 +267,12 @@ namespace VotingSystem.Infrastructure.Migrations
                     b.Property<int>("OptionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("SessionIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("VoteDate")
                         .HasColumnType("datetime2");
@@ -210,23 +297,18 @@ namespace VotingSystem.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("hasSubmitted")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
                     b.ToTable("Voters");
                 });
 
-            modelBuilder.Entity("VotingSystem.Infrastructure.Identity.PlatFormRole", b =>
+            modelBuilder.Entity("VotingSystem.Infrastructure.Identity.Models.PlatFormRole", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -254,7 +336,7 @@ namespace VotingSystem.Infrastructure.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("VotingSystem.Infrastructure.Identity.PlatFormUser", b =>
+            modelBuilder.Entity("VotingSystem.Infrastructure.Identity.Models.PlatFormUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -267,12 +349,18 @@ namespace VotingSystem.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -296,6 +384,12 @@ namespace VotingSystem.Infrastructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RevokedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -322,7 +416,7 @@ namespace VotingSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("VotingSystem.Infrastructure.Identity.PlatFormRole", null)
+                    b.HasOne("VotingSystem.Infrastructure.Identity.Models.PlatFormRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -331,7 +425,7 @@ namespace VotingSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("VotingSystem.Infrastructure.Identity.PlatFormUser", null)
+                    b.HasOne("VotingSystem.Infrastructure.Identity.Models.PlatFormUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -340,7 +434,7 @@ namespace VotingSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("VotingSystem.Infrastructure.Identity.PlatFormUser", null)
+                    b.HasOne("VotingSystem.Infrastructure.Identity.Models.PlatFormUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -349,13 +443,13 @@ namespace VotingSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("VotingSystem.Infrastructure.Identity.PlatFormRole", null)
+                    b.HasOne("VotingSystem.Infrastructure.Identity.Models.PlatFormRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VotingSystem.Infrastructure.Identity.PlatFormUser", null)
+                    b.HasOne("VotingSystem.Infrastructure.Identity.Models.PlatFormUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -364,7 +458,7 @@ namespace VotingSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("VotingSystem.Infrastructure.Identity.PlatFormUser", null)
+                    b.HasOne("VotingSystem.Infrastructure.Identity.Models.PlatFormUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -373,8 +467,19 @@ namespace VotingSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("VotingSystem.Domain.Entities.Option", b =>
                 {
-                    b.HasOne("VotingSystem.Domain.Entities.Poll", "Poll")
+                    b.HasOne("VotingSystem.Domain.Entities.Question", "Question")
                         .WithMany("Options")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("VotingSystem.Domain.Entities.Question", b =>
+                {
+                    b.HasOne("VotingSystem.Domain.Entities.Poll", "Poll")
+                        .WithMany("Questions")
                         .HasForeignKey("PollId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -405,6 +510,11 @@ namespace VotingSystem.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("VotingSystem.Domain.Entities.Poll", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("VotingSystem.Domain.Entities.Question", b =>
                 {
                     b.Navigation("Options");
                 });
