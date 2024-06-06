@@ -9,6 +9,6 @@ namespace VotingSystem.Application.Abstractions.Services
 {
     public interface IVoteService
     {
-        Task<VoteAddDto> AddAsync(VoteAddDto voteAddDto);
+        Task<List<VoteAddDto>> AddAsync(List<VoteAddDto> votes);
     }
 }

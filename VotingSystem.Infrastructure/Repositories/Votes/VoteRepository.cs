@@ -18,9 +18,9 @@ namespace VotingSystem.Infrastructure.Repositories.Votes
         {
             _context = context;
         }
-        public async Task AddAsync(Vote vote)
+        public async Task AddAsync(List<Vote> votes)
         {
-            await _context.Votes.AddAsync(vote);
+            await _context.Votes.AddRangeAsync(votes);
             await _context.SaveChangesAsync();
         }
        

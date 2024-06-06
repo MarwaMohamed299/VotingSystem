@@ -15,27 +15,33 @@ namespace VotingSystem.Application.Services
     {
         private readonly IVoteRepository _repo;
         private readonly IHttpContextAccessor _contextAccessor;
+        private List<Vote> _votesToAdd = new List<Vote>();
 
         public VotesService(IVoteRepository  repo , IHttpContextAccessor contextAccessor)
         {
             _repo = repo;
             _contextAccessor = contextAccessor;
         }
-        public async Task<VoteAddDto> AddAsync(VoteAddDto voteAddDto)
+        public async Task<List<VoteAddDto>> AddAsync(List<VoteAddDto> votes)
         {
             var sessionId = Guid.NewGuid().ToString();
 
             _contextAccessor.HttpContext.Response.Cookies.Append("sessionid", sessionId);
 
-            var vote = new Vote
+            foreach (var vote in votes)
             {
-                OptionId = voteAddDto.OptionId,
-                VoterId = voteAddDto.VoterId,
-                VoteDate = voteAddDto.VoteDate,
-                SessionIdentifier = sessionId
-            };
-            await _repo.AddAsync(vote);
-            return voteAddDto;
+                var voteEntity = new Vote
+                {
+                    OptionId = vote.OptionId,
+                    VoterId = vote.VoterId,
+                    VoteDate = vote.VoteDate,
+                    SessionIdentifier = sessionId
+                };
+
+               _votesToAdd.Add(voteEntity);
+            }
+            await _repo.AddAsync(_votesToAdd);
+            return votes;
         }
     }
 }

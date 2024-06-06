@@ -19,9 +19,9 @@ namespace VotingSystem.API.Controllers
         }
         //[Authorize]
         [HttpPost]
-        public async Task<ActionResult<VoteAddDto>> AddVote(VoteAddDto vote)
+        public async Task<ActionResult<VoteAddDto>> AddVote(List<VoteAddDto> votes)
         {
-            var result = await _service.AddAsync(vote);
+            var result = await _service.AddAsync(votes);
             return Ok(result);
         }
     }
