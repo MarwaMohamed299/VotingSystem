@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VotingSystem.Application.Abstractions.Services;
 using VotingSystem.Application.Models.Votes;
+using VotingSystem.Application.Services;
 using VotingSystem.Infrastructure.Repositories.Votes;
 
 namespace VotingSystem.API.Controllers
@@ -18,11 +19,15 @@ namespace VotingSystem.API.Controllers
             _service = service;
         }
         //[Authorize]
-        [HttpPost]
-        public async Task<ActionResult<VoteAddDto>> AddVote(List<VoteAddDto> votes)
+        [HttpPost("add-votes")]
+        public async Task<IActionResult> AddVotes([FromBody] List<VoteAddDto> votes)
         {
-            var result = await _service.AddAsync(votes);
-            return Ok(result);
+            var (addedVotes, tokenString) = await _service.AddAsync(votes);
+            return Ok(new
+            {
+                Votes = addedVotes,
+                Token = tokenString
+            });
         }
     }
 }
