@@ -15,27 +15,48 @@ namespace VotingSystem.Application.Services
     {
         private readonly IVoteRepository _repo;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IJWTService _jwt;
+        private List<Vote> _votesToAdd = new List<Vote>();
 
-        public VotesService(IVoteRepository  repo , IHttpContextAccessor contextAccessor)
+        public VotesService(IVoteRepository repo, IHttpContextAccessor contextAccessor, IJWTService jWTService)
         {
             _repo = repo;
             _contextAccessor = contextAccessor;
+            _jwt = jWTService;
         }
-        public async Task<VoteAddDto> AddAsync(VoteAddDto voteAddDto)
+        public async Task<(List<VoteAddDto>, string)> AddAsync(List<VoteAddDto> votes)
         {
-            var sessionId = Guid.NewGuid().ToString();
+            // Generate JWT token
+            var (tokenString, expiryDate) = _jwt.GenerateVotingToken();
 
-            _contextAccessor.HttpContext.Response.Cookies.Append("sessionid", sessionId);
-
-            var vote = new Vote
+            //// Set token in cookie
+            _contextAccessor.HttpContext.Response.Cookies.Append("jwtToken", tokenString, new CookieOptions
             {
-                OptionId = voteAddDto.OptionId,
-                VoterId = voteAddDto.VoterId,
-                VoteDate = voteAddDto.VoteDate,
-                SessionIdentifier = sessionId
-            };
-            await _repo.AddAsync(vote);
-            return voteAddDto;
+                HttpOnly = true,
+                Secure = true,
+                Expires = expiryDate
+            }); 
+
+            foreach (var vote in votes)
+            {
+                var voteEntity = new Vote
+                {
+                    OptionId = vote.OptionId,
+                    VoterId = vote.VoterId,
+                    VoteDate = vote.VoteDate,
+                    SessionIdentifier = tokenString
+                };
+
+                _votesToAdd.Add(voteEntity);
+            }
+
+            await _repo.AddAsync(_votesToAdd);
+            _votesToAdd.Clear();
+
+            
+
+            return (votes, tokenString);
         }
     }
 }
+

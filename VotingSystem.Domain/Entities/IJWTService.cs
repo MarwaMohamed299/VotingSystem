@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VotingSystem.Application.Models.Votes;
 
 namespace VotingSystem.Application.Abstractions.Services
 {
-    public interface IVoteService
+    public interface IJWTService
     {
-        Task<(List<VoteAddDto>, string)> AddAsync(List<VoteAddDto> votes);
+        public (string TokenString, DateTime ExpiryDate) GenerateVotingToken();
     }
 }

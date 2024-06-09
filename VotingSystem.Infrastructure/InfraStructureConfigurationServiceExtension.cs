@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using VotingSystem.Application.Abstractions.Services;
 using VotingSystem.Infrastructure.Data.Context;
 using VotingSystem.Infrastructure.Identity.UserService;
+using VotingSystem.Infrastructure.JWTService;
 using VotingSystem.Infrastructure.Repositories.Polls;
 using VotingSystem.Infrastructure.Repositories.Votes;
 
@@ -30,6 +31,7 @@ namespace VotingSystem.Infrastructure
             #region Repos
             services.AddScoped<IPollRepository, PollRepository>();
             services.AddScoped<IVoteRepository, VoteRepository>();
+            services.AddScoped<IJWTService, JwtService>();
             #endregion
 
             #region Identity

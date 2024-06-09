@@ -4,6 +4,6 @@ namespace VotingSystem.Infrastructure.Repositories.Votes
 {
     public interface IVoteRepository
     {
-        Task AddAsync(Vote vote);
+        Task AddAsync(List<Vote> votes);
     }
 }
