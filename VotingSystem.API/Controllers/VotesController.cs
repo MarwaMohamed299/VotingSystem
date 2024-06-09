@@ -18,8 +18,7 @@ namespace VotingSystem.API.Controllers
         {
             _service = service;
         }
-        //[Authorize]
-        [HttpPost("add-votes")]
+        [HttpPost]
         public async Task<IActionResult> AddVotes([FromBody] List<VoteAddDto> votes)
         {
             var (addedVotes, tokenString) = await _service.AddAsync(votes);

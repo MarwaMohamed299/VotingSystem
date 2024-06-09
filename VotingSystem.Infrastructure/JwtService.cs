@@ -32,7 +32,7 @@ namespace VotingSystem.Infrastructure.JWTService
             var claims = new List<Claim>
             {
                 new Claim("SessionId","##54Id23651@1"),
-                new Claim("CurrentDateTime" ,DateTime.UtcNow.ToString())
+                new Claim("CurrentDateTime" ,DateTime.Now.ToString())
             };
 
             var jwt = new JwtSecurityToken(
