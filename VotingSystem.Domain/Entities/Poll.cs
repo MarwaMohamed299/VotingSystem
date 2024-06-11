@@ -9,7 +9,9 @@ namespace VotingSystem.Domain.Entities
     public class Poll
     {
         public int PollId { get; set; }
-        public string Title { get; set; } = string.Empty;
+        public string TitleAr { get; set; } = string.Empty;
+        public string TitleEn { get; set; } = string.Empty;
+
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         //NavProp

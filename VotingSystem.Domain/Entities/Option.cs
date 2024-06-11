@@ -9,7 +9,9 @@ namespace VotingSystem.Domain.Entities
     public class Option
     {
         public int OptionId { get; set; }
-        public string Description { get; set; } = string.Empty;
+        public string DescriptionAr { get; set; } = string.Empty;
+        public string DescriptionEn { get; set; } = string.Empty;
+
         //NavProp
         public int QuestionId { get; set; }
         public Question? Question { get; set; }

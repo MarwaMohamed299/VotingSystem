@@ -31,22 +31,23 @@ namespace VotingSystem.Infrastructure.Data.Context
             base.OnModelCreating(modelBuilder);
             // Seeding data
             modelBuilder.Entity<Poll>().HasData(
-                new Poll { PollId = 1, Title = "Favorite Programming Language", StartDate = new DateTime(2024, 5, 1), EndDate = new DateTime(2024, 5, 31) }
+                new Poll { PollId = 1, TitleEn = "Favorite Programming Language", TitleAr = "لغة البرمجة المفضلة", StartDate = new DateTime(2024, 5, 1), EndDate = new DateTime(2024, 5, 31) }
             );
 
             modelBuilder.Entity<Question>().HasData(
-                new Question { QuestionId = 1, PollId = 1, Text = "What is your favorite backend language?" },
-                new Question { QuestionId = 2, PollId = 1, Text = "What is your favorite frontend language?" }
+                new Question { QuestionId = 1, PollId = 1, TextEn = "What is your favorite backend language?", TextAr = "ما هي لغة الخلفية المفضلة لديك؟" },
+                new Question { QuestionId = 2, PollId = 1, TextEn = "What is your favorite frontend language?", TextAr = "ما هي لغة الواجهة الأمامية المفضلة لديك؟" }
             );
 
             modelBuilder.Entity<Option>().HasData(
-                new Option { OptionId = 1, QuestionId = 1, Description = "C#" },
-                new Option { OptionId = 2, QuestionId = 1, Description = "Java" },
-                new Option { OptionId = 3, QuestionId = 1, Description = "Python" },
-                new Option { OptionId = 4, QuestionId = 2, Description = "JavaScript" },
-                new Option { OptionId = 5, QuestionId = 2, Description = "TypeScript" },
-                new Option { OptionId = 6, QuestionId = 2, Description = "Dart" }
+                new Option { OptionId = 1, QuestionId = 1, DescriptionEn = "C#", DescriptionAr = "سي شارب" },
+                new Option { OptionId = 2, QuestionId = 1, DescriptionEn = "Java", DescriptionAr = "جافا" },
+                new Option { OptionId = 3, QuestionId = 1, DescriptionEn = "Python", DescriptionAr = "بايثون" },
+                new Option { OptionId = 4, QuestionId = 2, DescriptionEn = "JavaScript", DescriptionAr = "جافا سكريبت" },
+                new Option { OptionId = 5, QuestionId = 2, DescriptionEn = "TypeScript", DescriptionAr = "تايب سكريبت" },
+                new Option { OptionId = 6, QuestionId = 2, DescriptionEn = "Dart", DescriptionAr = "دارت" }
             );
+
         }
     }
 }

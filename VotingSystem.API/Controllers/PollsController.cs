@@ -19,9 +19,9 @@ namespace VotingSystem.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PollReadDto>> GetPoll(int id)
+        public async Task<ActionResult<PollReadDto>> GetPoll(int id, string language)
         {
-            var poll = await _poll.GetPollWithQuestionsAsync(id);            
+            var poll = await _poll.GetPollWithQuestionsAsync(id,language);            
             return Ok(poll);
         }
         [HttpGet("{pollId}/votes")]

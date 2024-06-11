@@ -52,9 +52,7 @@ namespace VotingSystem.Application.Services
 
             await _repo.AddAsync(_votesToAdd);
             _votesToAdd.Clear();
-
-            
-
+           
             return (votes, tokenString);
         }
     }

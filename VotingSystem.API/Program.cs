@@ -9,6 +9,8 @@ using VotingSystem.Infrastructure.Identity.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,6 +83,25 @@ try
 
     #endregion
 
+    #region Localization
+
+    builder.Services.Configure<RequestLocalizationOptions>(options =>
+    {
+         var supportedCulture = new List<CultureInfo>
+                {
+                   new CultureInfo("en-Us"),
+                   new CultureInfo("ar-Sa")
+                };
+        options.DefaultRequestCulture = new RequestCulture(culture: "ar", uiCulture: "Sa");
+        options.SupportedCultures = supportedCulture;
+        options.SupportedUICultures = supportedCulture;
+
+    });
+
+    builder.Services.AddLocalization();
+
+    #endregion
+
     #region CORS Policy
     builder.Services.AddCors(options =>
     {
@@ -101,7 +122,7 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
     }
-
+    app.UseRequestLocalization();
     app.UseHttpsRedirection();
     app.UseAuthentication();
     app.UseAuthorization();

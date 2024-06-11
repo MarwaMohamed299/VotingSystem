@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VotingSystem.Infrastructure.Data.Context;
 
@@ -11,9 +12,11 @@ using VotingSystem.Infrastructure.Data.Context;
 namespace VotingSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(VotingSystemContext))]
-    partial class VotingSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240611091002_Localization")]
+    partial class Localization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,42 +157,42 @@ namespace VotingSystem.Infrastructure.Migrations
                         new
                         {
                             OptionId = 1,
-                            DescriptionAr = "سي شارب",
+                            DescriptionAr = "",
                             DescriptionEn = "C#",
                             QuestionId = 1
                         },
                         new
                         {
                             OptionId = 2,
-                            DescriptionAr = "جافا",
+                            DescriptionAr = "",
                             DescriptionEn = "Java",
                             QuestionId = 1
                         },
                         new
                         {
                             OptionId = 3,
-                            DescriptionAr = "بايثون",
+                            DescriptionAr = "",
                             DescriptionEn = "Python",
                             QuestionId = 1
                         },
                         new
                         {
                             OptionId = 4,
-                            DescriptionAr = "جافا سكريبت",
+                            DescriptionAr = "",
                             DescriptionEn = "JavaScript",
                             QuestionId = 2
                         },
                         new
                         {
                             OptionId = 5,
-                            DescriptionAr = "تايب سكريبت",
+                            DescriptionAr = "",
                             DescriptionEn = "TypeScript",
                             QuestionId = 2
                         },
                         new
                         {
                             OptionId = 6,
-                            DescriptionAr = "دارت",
+                            DescriptionAr = "",
                             DescriptionEn = "Dart",
                             QuestionId = 2
                         });
@@ -227,7 +230,7 @@ namespace VotingSystem.Infrastructure.Migrations
                             PollId = 1,
                             EndDate = new DateTime(2024, 5, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             StartDate = new DateTime(2024, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            TitleAr = "لغة البرمجة المفضلة",
+                            TitleAr = "",
                             TitleEn = "Favorite Programming Language"
                         });
                 });
@@ -262,14 +265,14 @@ namespace VotingSystem.Infrastructure.Migrations
                         {
                             QuestionId = 1,
                             PollId = 1,
-                            TextAr = "ما هي لغة الخلفية المفضلة لديك؟",
+                            TextAr = "",
                             TextEn = "What is your favorite backend language?"
                         },
                         new
                         {
                             QuestionId = 2,
                             PollId = 1,
-                            TextAr = "ما هي لغة الواجهة الأمامية المفضلة لديك؟",
+                            TextAr = "",
                             TextEn = "What is your favorite frontend language?"
                         });
                 });

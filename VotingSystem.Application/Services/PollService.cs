@@ -16,35 +16,63 @@ namespace VotingSystem.Application.Services
     public class PollService : IPollService
     {
         private readonly IPollRepository _repo;
+        private readonly ILocalizationService _localization;
 
-        public PollService(IPollRepository repository)
+        public PollService(IPollRepository repository , ILocalizationService localization)
         {
             _repo = repository;
+            _localization = localization;
         }
-        public async Task<PollReadDto?> GetPollWithQuestionsAsync(int id)
+        public async Task<PollReadDto?> GetPollWithQuestionsAsync(int id, string language)
         {
             var pollWithQuestions = await _repo.GetPollWithQuestionsAsync(id);
-
-            var pollDto = new PollReadDto
+            var lang = _localization.DetermineLanguage(language);
+            if (lang.Equals("en",  StringComparison.OrdinalIgnoreCase))
             {
-                PollId = pollWithQuestions.PollId,
-                StartDate = pollWithQuestions.StartDate,
-                EndDate = pollWithQuestions.EndDate,
-                Title = pollWithQuestions.Title,
-                Questions = pollWithQuestions.Questions.Select(q => new QuestionReadDto
+                var pollDto = new PollReadDto
                 {
-                    QuestionId = q.QuestionId,
-                    Text = q.Text,
-                    Options = q.Options.Select(o => new OptionReadDto
+                    PollId = pollWithQuestions.PollId,
+                    StartDate = pollWithQuestions.StartDate,
+                    EndDate = pollWithQuestions.EndDate,
+                    Title = pollWithQuestions.TitleEn,
+                    Questions = pollWithQuestions.Questions.Select(q => new QuestionReadDto
                     {
-                        OptionId = o.OptionId,
-                        Description = o.Description
+                        QuestionId = q.QuestionId,
+                        Text = q.TextEn,
+                        Options = q.Options.Select(o => new OptionReadDto
+                        {
+                            OptionId = o.OptionId,
+                            Description = o.DescriptionEn
+                        }).ToList()
                     }).ToList()
-                }).ToList()
-            };
+                };
 
-            return pollDto;
+                return pollDto;
+            }
+            else
+            {
+                var pollDto = new PollReadDto
+                {
+                    PollId = pollWithQuestions.PollId,
+                    StartDate = pollWithQuestions.StartDate,
+                    EndDate = pollWithQuestions.EndDate,
+                    Title = pollWithQuestions.TitleAr,
+                    Questions = pollWithQuestions.Questions.Select(q => new QuestionReadDto
+                    {
+                        QuestionId = q.QuestionId,
+                        Text = q.TextAr,
+                        Options = q.Options.Select(o => new OptionReadDto
+                        {
+                            OptionId = o.OptionId,
+                            Description = o.DescriptionAr
+                        }).ToList()
+                    }).ToList()
+                };
+
+                return pollDto;
+            }
         }
+
 
         public async Task<List<PollQuestionDto>> GetVotesCountForOptionsAsync(int pollId)
         {
@@ -53,11 +81,11 @@ namespace VotingSystem.Application.Services
             var questionDtos = poll.Questions.Select(q => new PollQuestionDto
             {
                 QuestionId = q.QuestionId,
-                Text = q.Text,
+                Text = q.TextEn,
                 Options = q.Options.Select(o => new PollOptionsVoteCountDto
                 {
                     OptionId = o.OptionId,
-                    Description = o.Description,
+                    Description = o.DescriptionEn,
                     VoteCount = o.Votes.Count
                 }).ToList()
             }).ToList();
@@ -69,15 +97,15 @@ namespace VotingSystem.Application.Services
         {
             var poll = new Poll
             {
-                Title = pollDto.Title,
+                TitleEn = pollDto.Title,
                 StartDate = pollDto.StartDate,
                 EndDate = pollDto.EndDate,
                 Questions = pollDto.Questions.Select(q => new Question
                 {
-                    Text = q.Text,
+                    TextEn= q.Text,
                     Options = q.options.Select(o => new Option
                     {
-                        Description=o.Description
+                        DescriptionEn=o.Description
                     }).ToList()
                 }).ToList()
             };
@@ -89,15 +117,15 @@ namespace VotingSystem.Application.Services
         {
             var poll = await _repo.GetPollByIdAsync(id);
 
-            poll!.Title = pollDto.Title;
+            poll!.TitleEn = pollDto.Title;
             poll.StartDate = pollDto.StartDate;
             poll.EndDate = pollDto.EndDate;
             poll.Questions = pollDto.Questions.Select(q => new Question
             {
-                Text = q.Text,
+                TextEn = q.Text,
                 Options = q.Options.Select(o => new Option
                 {
-                    Description = o.Description
+                    DescriptionEn = o.Description
                 }).ToList()
             }).ToList();
 

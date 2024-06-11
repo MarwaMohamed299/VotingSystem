@@ -11,7 +11,7 @@ namespace VotingSystem.Application.Abstractions.Services
 {
     public interface IPollService
     {
-        Task<PollReadDto?> GetPollWithQuestionsAsync(int id);
+        Task<PollReadDto?> GetPollWithQuestionsAsync(int id, string language);
         Task<List<PollQuestionDto>> GetVotesCountForOptionsAsync(int pollId);
         Task<PollAddDto> AddPollAsync(PollAddDto pollDto);
         Task<PollUpdateDto> UpdatePollAsync(PollUpdateDto pollDto, int id);

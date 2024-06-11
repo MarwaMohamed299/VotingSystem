@@ -1,11 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 using VotingSystem.Application.Abstractions.Services;
 using VotingSystem.Infrastructure.Data.Context;
 using VotingSystem.Infrastructure.Identity.UserService;
@@ -38,6 +36,7 @@ namespace VotingSystem.Infrastructure
             services.AddScoped<IUserService, UserService>();
             #endregion
 
+           
             return services;
         }
     }

@@ -9,7 +9,9 @@ namespace VotingSystem.Domain.Entities
     public class Question
     {
         public int QuestionId { get; set; }
-        public string Text { get; set; } = string.Empty;
+        public string TextAr { get; set; } = string.Empty;
+        public string TextEn { get; set; } = string.Empty;
+
         // Navigation Property
         public int PollId { get; set; }
         public Poll? Poll { get; set; }
