@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,9 @@ using VotingSystem.Application.Models.Questions;
 using VotingSystem.Domain.Entities;
 using VotingSystem.Infrastructure.Repositories;
 using VotingSystem.Infrastructure.Repositories.Polls;
+using VotingSystem.Domain.Constants;
+using Constants = VotingSystem.Domain.Constants.Constants;
+
 
 namespace VotingSystem.Application.Services
 {
@@ -27,7 +31,7 @@ namespace VotingSystem.Application.Services
         {
             var pollWithQuestions = await _repo.GetPollWithQuestionsAsync(id);
             var lang = _localization.DetermineLanguage(language);
-            if (lang.Equals("en",  StringComparison.OrdinalIgnoreCase))
+            if (lang.Equals(Constants.English))
             {
                 var pollDto = new PollReadDto
                 {
