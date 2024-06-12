@@ -10,6 +10,6 @@ namespace VotingSystem.Application.Abstractions.Services
 {
     public interface ILocalizationService
     {
-        string DetermineLanguage(string language);
+        string DetermineLanguage(HttpRequest request);
     }
 }

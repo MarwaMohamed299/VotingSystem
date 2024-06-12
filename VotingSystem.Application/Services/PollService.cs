@@ -13,6 +13,7 @@ using VotingSystem.Infrastructure.Repositories;
 using VotingSystem.Infrastructure.Repositories.Polls;
 using VotingSystem.Domain.Constants;
 using Constants = VotingSystem.Domain.Constants.Constants;
+using Microsoft.AspNetCore.Http;
 
 
 namespace VotingSystem.Application.Services
@@ -30,52 +31,28 @@ namespace VotingSystem.Application.Services
         public async Task<PollReadDto?> GetPollWithQuestionsAsync(int id, string language)
         {
             var pollWithQuestions = await _repo.GetPollWithQuestionsAsync(id);
-            var lang = _localization.DetermineLanguage(language);
-            if (lang.Equals(Constants.English))
-            {
-                var pollDto = new PollReadDto
-                {
-                    PollId = pollWithQuestions.PollId,
-                    StartDate = pollWithQuestions.StartDate,
-                    EndDate = pollWithQuestions.EndDate,
-                    Title = pollWithQuestions.TitleEn,
-                    Questions = pollWithQuestions.Questions.Select(q => new QuestionReadDto
-                    {
-                        QuestionId = q.QuestionId,
-                        Text = q.TextEn,
-                        Options = q.Options.Select(o => new OptionReadDto
-                        {
-                            OptionId = o.OptionId,
-                            Description = o.DescriptionEn
-                        }).ToList()
-                    }).ToList()
-                };
 
-                return pollDto;
-            }
-            else
+            var pollDto = new PollReadDto
             {
-                var pollDto = new PollReadDto
+                PollId = pollWithQuestions.PollId,
+                StartDate = pollWithQuestions.StartDate,
+                EndDate = pollWithQuestions.EndDate,
+                Title = language == Constants.English ? pollWithQuestions.TitleEn : pollWithQuestions.TitleAr,
+                Questions = pollWithQuestions.Questions.Select(q => new QuestionReadDto
                 {
-                    PollId = pollWithQuestions.PollId,
-                    StartDate = pollWithQuestions.StartDate,
-                    EndDate = pollWithQuestions.EndDate,
-                    Title = pollWithQuestions.TitleAr,
-                    Questions = pollWithQuestions.Questions.Select(q => new QuestionReadDto
+                    QuestionId = q.QuestionId,
+                    Text = language == Constants.English ? q.TextEn : q.TextAr,
+                    Options = q.Options.Select(o => new OptionReadDto
                     {
-                        QuestionId = q.QuestionId,
-                        Text = q.TextAr,
-                        Options = q.Options.Select(o => new OptionReadDto
-                        {
-                            OptionId = o.OptionId,
-                            Description = o.DescriptionAr
-                        }).ToList()
+                        OptionId = o.OptionId,
+                        Description = language == Constants.English ? o.DescriptionEn : o.DescriptionAr
                     }).ToList()
-                };
+                }).ToList()
+            };
 
-                return pollDto;
-            }
+            return pollDto;
         }
+
 
 
         public async Task<List<PollQuestionDto>> GetVotesCountForOptionsAsync(int pollId)

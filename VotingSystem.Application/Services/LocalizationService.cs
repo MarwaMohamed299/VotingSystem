@@ -11,19 +11,52 @@ using VotingSystem.Domain.Constants;
 
 namespace VotingSystem.Application.Services
 {
-    public class LocalizationService :ILocalizationService
+    public class LocalizationService : ILocalizationService
     {
-        public string DetermineLanguage( string language)
+        //public string DetermineLanguage(HttpRequest request)
+        //{
+        //    //if (request.Headers.ContainsKey("Accept-Language"))
+        //    //{
+        //    //    var languages = request.Headers["Accept-Language"];
+        //    //    if (languages.Any(x => x.StartsWith(Constants.Arabic, StringComparison.OrdinalIgnoreCase)))
+        //    //    {
+        //    //        return Constants.Arabic;
+        //    //    }
+        //    //}
+        //    //return Constants.English;
+        //    var language = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
+
+        //    switch (language)
+        //    {
+        //        case Constants.Arabic:
+        //            return Constants.Arabic;
+        //        case Constants.English:
+        //            return Constants.English;
+        //        default:
+        //            return Constants.Arabic;
+        //    }
+        //}
+        public string DetermineLanguage(HttpRequest request)
         {
+            var acceptLanguageHeader = request.Headers["Accept-Language"].ToString();
+            string language = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
+
+            if (!string.IsNullOrEmpty(acceptLanguageHeader))
+            {
+
+                // language = Constants.Arabic;
+                language = acceptLanguageHeader.Split(',').FirstOrDefault();
+            }
+
             switch (language)
             {
                 case Constants.Arabic:
+                    return Constants.Arabic;
                 case Constants.English:
-                    return language;
+                    return Constants.English;
                 default:
                     return Constants.Arabic;
             }
-
         }
 
     }

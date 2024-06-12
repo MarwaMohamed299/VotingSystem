@@ -18,9 +18,10 @@ namespace VotingSystem.Application
             IConfiguration configuration)
         {
             #region services
+            services.AddScoped<ILocalizationService, LocalizationService>();
+
             services.AddScoped<IPollService, PollService>();
             services.AddScoped<IVoteService, VotesService>();
-            services.AddScoped<ILocalizationService, LocalizationService>();
 
             #endregion
             services.AddHttpContextAccessor();

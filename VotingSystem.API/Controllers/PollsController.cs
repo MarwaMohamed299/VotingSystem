@@ -4,6 +4,7 @@ using VotingSystem.Application.Abstractions.Services;
 using VotingSystem.Application.Models.Options;
 using VotingSystem.Application.Models.Polls;
 using VotingSystem.Application.Services;
+using VotingSystem.Infrastructure.Migrations;
 
 namespace VotingSystem.API.Controllers
 {
@@ -12,18 +13,22 @@ namespace VotingSystem.API.Controllers
     public class PollsController : ControllerBase
     {
         private readonly IPollService _poll;
+        private readonly ILocalizationService _localization;
 
-        public PollsController(IPollService pollservice)
+        public PollsController(IPollService pollservice, ILocalizationService localization)
         {
             _poll = pollservice;
+            _localization = localization;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PollReadDto>> GetPoll(int id, string language)
+        public async Task<ActionResult<PollReadDto>> GetPoll(int id)
         {
-            var poll = await _poll.GetPollWithQuestionsAsync(id,language);            
+            var language = _localization.DetermineLanguage(Request); 
+            var poll = await _poll.GetPollWithQuestionsAsync(id, language);
             return Ok(poll);
         }
+
         [HttpGet("{pollId}/votes")]
         public async Task<ActionResult<List<PollOptionsVoteCountDto>>> GetVotesCountForOptions(int pollId)
         {
